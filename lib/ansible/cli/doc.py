@@ -120,7 +120,7 @@ class DocCLI(CLI):
                     # this typically means we couldn't even parse the docstring, not just that the YAML is busted,
                     # probably a quoting issue.
                     raise AnsibleError("Parsing produced an empty object.")
-            except Exception, e:
+            except Exception as e:
                 self.display.vvv(traceback.print_exc())
                 raise AnsibleError("module %s missing documentation (or could not parse documentation): %s\n" % (module, str(e)))
 
@@ -233,7 +233,10 @@ class DocCLI(CLI):
         text = []
         text.append("> %s\n" % doc['module'].upper())
 
-        desc = " ".join(doc['description'])
+        if isinstance(doc['description'], list):
+            desc = " ".join(doc['description'])
+        else:
+            desc = doc['description']
 
         text.append("%s\n" % textwrap.fill(CLI.tty_ify(desc), initial_indent="  ", subsequent_indent="  "))
 
@@ -250,7 +253,10 @@ class DocCLI(CLI):
 
             text.append("%s %s" % (opt_leadin, o))
 
-            desc = " ".join(opt['description'])
+            if isinstance(doc['description'], list):
+                desc = " ".join(doc['description'])
+            else:
+                desc = doc['description']
 
             if 'choices' in opt:
                 choices = ", ".join(str(i) for i in opt['choices'])
